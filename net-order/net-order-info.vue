@@ -1,0 +1,455 @@
+<template>
+  <div class="orderInfo-bgc">
+    <div class="wrap">
+      <div class="mautoall" style="padding-top: 0px">
+        <div class="layout">
+          <el-form ref="form" :model="form" :inline="true" label-width="130px">
+            <div class="numBox">
+              <!-- 标题 -->
+              <h3 class="n-title">
+                <em>海量选号</em>
+              </h3>
+              <!--  -->
+              <div class="shopMsg_all">
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="手机号码：" prop="num">
+                      <span>{{ form.num }}</span>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="号码归属：" prop="city">
+                      <span>{{ form.city }}</span>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="24">
+                    <el-form-item label="价格：" prop="price">
+                      <span class="fl j-numlistprice"><em class="dw rcl">￥</em><em class="jg rcl">{{ form.price }}</em>元</span>
+                      <span class="fl j-numlitbdhyq">（含话费<em class="rcl">0</em>元，保底<em class="rcl">0</em>元/月，合约期<em class="rcl">0</em>个月）</span>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="购买方式：" prop="manner">
+                      <el-input v-model="form.manner" placeholder="请输入身份证号码" class="busi-style"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="营业厅选择：" prop="businessHall">
+                      <span>{{ form.businessHall }}</span>
+                      <el-input
+                        v-if="form.businessHall"
+                        v-model="form.businessHall"
+                        class="choose-input busi-style"
+                        disabled
+                      >
+                      </el-input>
+                      <el-button type="primary" class="busi-btn" @click="handleHallView()">
+                        {{ form.businessHall === '' ? '选择营业厅':'换营业厅' }}
+                      </el-button>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="客户姓名：" prop="name">
+                      <el-input v-model="form.name" placeholder="请输入客户姓名"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="身份证号码：" prop="idCard">
+                      <el-input v-model="form.idCard" placeholder="请输入身份证号码"></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="联系电话：" prop="number">
+                      <el-input v-model="form.number" placeholder="请输入电话号码"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="验证码：" prop="authCode">
+                      <el-input
+                        v-model.trim="form.authCode"
+                        name="authCode"
+                        type="text"
+                        placeholder="请输入图形验证码"
+                        :maxlength="5"
+                        @keyup.enter.native="handleLogin"
+                      ></el-input>
+                      <!-- <img
+                        :src.sync="jcaptcha"
+                        class="validate"
+                        @click="changeCaptcha"
+                      /> -->
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row class="n-btn">
+                  <el-button class="btn">确认预约</el-button>
+                </el-row>
+              </div>
+              <div>
+                <img src="../../assets/images/net-order/pic-01.jpg" width="100%">
+              </div>
+            </div>
+          </el-form>
+        </div>
+      </div>
+    </div>
+    <el-dialog :visible.sync="addVisible" append-to-body width="77%" top="5vh" custom-class="my-info-dialog">
+      <div
+        slot="title"
+        class="top_fl"
+      >
+        可预约营业厅
+      </div>
+      <busi-view
+        v-if="addVisible"
+        ref="busiView"
+        @changeRow="changeRow"
+      >
+      </busi-view>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleConfirmAdd">
+        </el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+<script>
+// import SchoolApi from '@api/modules/school'
+import busiView from './component/businessHallView.vue'
+
+export default {
+  components: {
+    busiView
+  },
+  data() {
+    return {
+      form: {
+        num: '18768149374',
+        city: '杭州', // 选择地市
+        price: '13', // 价格
+        manner: '预约至附近营业厅', // 购买方式
+        businessHall: '', // 营业厅
+        name: '', // 客户姓名
+        idCard: '', // 身份证
+        number: '', // 联系电话
+        authCode: '' // 验证码
+      },
+      // 是否展示营业厅选择弹窗
+      addVisible: false,
+      pageData: {
+        total: 0,
+        results: [],
+        pageNum: 1,
+        pageSize: 24
+      },
+      telInfoList: [], // 号码信息列表
+      selectedNum: '', // 选中的号码
+      cities: [
+        {
+          value: 'Beijing',
+          label: '北京'
+        },
+        {
+          value: 'Shanghai',
+          label: '上海'
+        },
+        {
+          value: 'Nanjing',
+          label: '南京'
+        },
+        {
+          value: 'Chengdu',
+          label: '成都'
+        },
+        {
+          value: 'Shenzhen',
+          label: '深圳'
+        },
+        {
+          value: 'Guangzhou',
+          label: '广州'
+        }
+      ],
+      value: ''
+    }
+  },
+  computed: {
+    changeBtnName: function() {
+      return this.searchFlag === true ? '精确搜索' : '模糊搜索'
+    }
+  },
+  mounted() {
+    // this.qryNumList()
+  },
+  methods: {
+    selectCityId() {
+      console.log(this.form)
+    },
+    changeSearch() {
+      this.searchFlag = !this.searchFlag
+    },
+    selectRuleBtn(index, item) {
+      if (item.state) {
+        if (this.isUp === index) {
+          this.isUp = ''
+          this.isDown = index
+          this.orderRule[index].state = false
+        } else {
+          this.isDown = ''
+          this.isUp = index
+        }
+      } else {
+        if (this.isDown === index) {
+          this.isDown = ''
+          this.isUp = index
+          this.orderRule[index].state = true
+        } else {
+          this.isUp = ''
+          this.isDown = index
+        }
+      }
+    },
+    handleHallView() {
+      this.addVisible = true
+      console.log(this.addVisible)
+    },
+    handleConfirmAdd() {
+      console.log('aa')
+    },
+    changeRow(val) {
+      // this.currentRow = val
+      console.log('=changeRow===', val)
+    },
+    handleSizeChange(size) {
+      this.queryParam.pageSize = size
+      this.handleQuery()
+    },
+    handleCurrentChange(currentPage) {
+      this.queryParam.pageNum = currentPage
+      this.pageData.pageNum = currentPage
+      this.handleQuery()
+    },
+
+    handleResetQuery() {
+      // 号码 预存 保底 合约期
+      this.queryParam = {
+        num: '',
+        priceScope: '',
+        consume: '',
+        tenor: '',
+        pageNum: 1,
+        pageSize: 10
+      }
+    }
+  }
+}
+</script>
+<style lang="scss">
+.orderInfo-bgc{
+  background-color: #fff;
+  .wrap {
+    /* background: #fff; */
+    font-size: 12px;
+    width: 1200px;
+    margin: 0px auto;
+    padding: 0;
+    color: #525252;
+    overflow-x: visible;
+    overflow-y: visible;
+    font-family: "宋体";
+    /* .el-dialog__body{
+      padding: 30px 0px;
+    } */
+    .numBox{
+      border-top: 4px solid #b92724;
+      border-left: 2px solid #dfdfdf;
+      border-bottom: 2px solid #dfdfdf;
+      border-right: 2px solid #dfdfdf;
+      .el-form-item__content{
+        line-height: 42px;
+      }
+      .el-input__inner{
+        text-align: left;
+        padding: 0 0 0 8px;
+        color: #b3b3b3;
+        font-family: '宋体';
+        font-size: 18px;
+        border-radius: 0px;
+      }
+      .busi-style{
+        .el-input__inner{
+          background: url('../../assets/images/net-order/bg-13.png') right bottom no-repeat;
+          border: 1px solid #ff5c00;
+          color: #454545;
+        }
+      }
+      .busi-btn{
+        padding: 0 18px;
+        height: 36px;
+        background: url('../../assets/images/net-order/bg-14.png') center no-repeat;
+        background-size: 100% 100%;
+        border: none;
+        color: #ffffff;
+        line-height: 36px;
+        font-size: 18px;
+        margin-top: 3px;
+        cursor: pointer;
+        text-align: center;
+      }
+      .n-btn{
+        text-align: center;
+        .btn{
+        width: 254px;
+        height: 68px;
+        text-align: center;
+        background: url('../../assets/images/net-order/bg-15.png') center no-repeat;
+        font-size: 36px;
+        color: #ffffff;
+        margin: 0 auto;
+        margin-top: 60px;
+        margin-bottom: 72px;
+        cursor: pointer;
+        }
+      }
+    }
+    .n-title {
+        height: 62px;
+        margin: 0;
+        margin-bottom: 15px;
+        background: url('../../assets/images/net-order/n-barBg.jpg')
+          repeat-x 0 -1px;
+        font-weight: normal;
+        font-size: 100%;
+        /* span {
+          font-size: 13px;
+        } */
+    }
+    .n-title em {
+        display: block;
+
+        width: 120px;
+        height: 61px;
+        line-height: 61px;
+        text-align: center;
+        margin-left: -1px;
+
+        font-size: 20px;
+        font-weight: normal;
+        font-style: normal;
+
+        background: url('../../assets/images/net-order/n-titleBg.png')
+          no-repeat;
+        color: #fff;
+    }
+    .shopMsg_all{
+        padding-left: 52px;
+        padding-top: 60px;
+        .el-row{
+          margin-bottom: 15px;
+        }
+        .el-col-24{
+          .el-form-item__label{
+            text-align: left;
+            font-size: 18px;
+            color: #3f3f3f;
+          }
+          .el-form-item__content{
+            font-size: 18px;
+          }
+          .rcl{
+            color: #e4393c;
+          }
+          .jg{
+            font-size: 24px;
+          }
+          em {
+            font-weight: normal;
+            font-style: normal;
+          }
+        }
+        .el-col-12{
+          margin-right: 127px;
+          width: 385px;
+          line-height: 42px;
+          margin-bottom: 5px;
+          font-size: 18px;
+          .el-form-item__label{
+            text-align: left;
+            font-size: 18px;
+            color: #3f3f3f;
+          }
+          .el-form-item__content{
+            font-size: 18px;
+          }
+        }
+    }
+  }
+}
+  .my-info-dialog{
+      height: 90%;
+      margin: auto;
+      /* div:nth-child(1){
+        padding: 0;
+      } */
+      .el-dialog__header{
+        padding: 0;
+        height: 58px;
+        background: #f2f2f2;
+        border-radius: 5px 5px 0 0;
+        padding-left: 17px;
+      }
+      .el-dialog__headerbtn{
+        font-size: 25px;
+        border: 2px solid #909399;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        top: 15px;
+      }
+      .el-dialog__headerbtn:focus .el-dialog__close, .el-dialog__headerbtn:hover .el-dialog__close{
+        color: #909399;
+      }
+      .el-dialog__body{
+        padding: 5px 26px;
+      }
+      .el-dialog__footer{
+        text-align: center;
+          margin: 0 auto;
+        .el-button{
+          width: 110px;
+          height: 38px;
+          background: url('../../assets/images/net-order/bg-21.jpg') center no-repeat;
+          margin-top: 17px;
+          margin-bottom: 20px;
+          cursor: pointer;
+        }
+        .el-button--primary{
+           color: #FFF;
+           background-color:#fff;
+           border-color: #fff;
+        }
+        .el-button--primary.is-active, .el-button--primary:active{
+           background-color:#fff;
+           border-color: #fff;
+        }
+      }
+      .top_fl{
+        float: left;
+        display: inline;
+        font-size: 20px;
+        color: #333333;
+        background: url('../../assets/images/net-order/pic-02.png') left center no-repeat;
+        line-height: 58px;
+        padding-left: 54px;
+      }
+    }
+
+</style>
