@@ -555,12 +555,13 @@ export default {
     }
     .n-title {
       height: 62px;
-      margin: 0;
-      margin-bottom: 15px;
-      background: url('../../assets/images/net-order/n-barBg.jpg')
-        repeat-x 0 -1px;
       font-weight: normal;
       font-size: 100%;
+      margin: 0;
+      margin-bottom: 15px;
+      font-size: 12px;
+      background: url('../../assets/images/net-order/n-barBg.jpg')
+        repeat-x 0 -1px;
       /* span {
         font-size: 13px;
       } */

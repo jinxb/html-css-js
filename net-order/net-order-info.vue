@@ -3,7 +3,7 @@
     <div class="wrap">
       <div class="mautoall" style="padding-top: 0px">
         <div class="layout">
-          <el-form ref="form" :model="form" :inline="true" label-width="130px">
+          <el-form ref="form" :model="form" :inline="true" label-width="120px">
             <div class="numBox">
               <!-- 标题 -->
               <h3 class="n-title">
@@ -34,16 +34,15 @@
                 <el-row>
                   <el-col :span="12">
                     <el-form-item label="购买方式：" prop="manner">
-                      <el-input v-model="form.manner" placeholder="请输入身份证号码" class="busi-style"></el-input>
+                      <el-input v-model="form.manner" placeholder="请输入身份证号码" class="busi-style" readonly></el-input>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="12">
+                  <el-col :span="12" class="otherStyle">
                     <el-form-item label="营业厅选择：" prop="businessHall">
-                      <span>{{ form.businessHall }}</span>
                       <el-input
                         v-if="form.businessHall"
                         v-model="form.businessHall"
-                        class="choose-input busi-style"
+                        class="busi-style"
                         disabled
                       >
                       </el-input>
@@ -66,12 +65,12 @@
                   </el-col>
                 </el-row>
                 <el-row>
-                  <el-col :span="12">
+                  <el-col :span="10">
                     <el-form-item label="联系电话：" prop="number">
                       <el-input v-model="form.number" placeholder="请输入电话号码"></el-input>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="12">
+                  <el-col :span="14" class="otherStyle">
                     <el-form-item label="验证码：" prop="authCode">
                       <el-input
                         v-model.trim="form.authCode"
@@ -81,6 +80,8 @@
                         :maxlength="5"
                         @keyup.enter.native="handleLogin"
                       ></el-input>
+                      <img class="fl j-changeyzm j-myyzm" src="//www.zj.10086.cn/shop-front-web/sinoaptcha1.jpg" height="29" title="看不清？点击图片重新获取验证码！" align="middle">
+                      <el-button class="changeBtn" @click="handleChange()">换一张</el-button>
                       <!-- <img
                         :src.sync="jcaptcha"
                         class="validate"
@@ -90,7 +91,7 @@
                   </el-col>
                 </el-row>
                 <el-row class="n-btn">
-                  <el-button class="btn">确认预约</el-button>
+                  <el-button class="btn" @click="handleMake()">确认预约</el-button>
                 </el-row>
               </div>
               <div>
@@ -144,6 +145,8 @@ export default {
       },
       // 是否展示营业厅选择弹窗
       addVisible: false,
+      // 保存选中的营业厅信息
+      hallInfo: {},
       pageData: {
         total: 0,
         results: [],
@@ -193,40 +196,18 @@ export default {
     selectCityId() {
       console.log(this.form)
     },
-    changeSearch() {
-      this.searchFlag = !this.searchFlag
-    },
-    selectRuleBtn(index, item) {
-      if (item.state) {
-        if (this.isUp === index) {
-          this.isUp = ''
-          this.isDown = index
-          this.orderRule[index].state = false
-        } else {
-          this.isDown = ''
-          this.isUp = index
-        }
-      } else {
-        if (this.isDown === index) {
-          this.isDown = ''
-          this.isUp = index
-          this.orderRule[index].state = true
-        } else {
-          this.isUp = ''
-          this.isDown = index
-        }
-      }
-    },
     handleHallView() {
       this.addVisible = true
       console.log(this.addVisible)
     },
     handleConfirmAdd() {
-      console.log('aa')
+      this.form.businessHall = this.hallInfo.hallName
+      this.addVisible = false
     },
     changeRow(val) {
       // this.currentRow = val
       console.log('=changeRow===', val)
+      this.hallInfo = val
     },
     handleSizeChange(size) {
       this.queryParam.pageSize = size
@@ -248,6 +229,23 @@ export default {
         pageNum: 1,
         pageSize: 10
       }
+    },
+    // 确认预约
+    handleMake() {
+      // 1. 判断用户信息是否填写完整
+
+      // 2. 判断用户输入信息格式是否有误
+
+      // 3. 预约逻辑
+      console.log('预约成功')
+      const params = {
+        name: 'jinbin',
+        age: '18'
+      }
+      this.$router.push({
+        name: 'netOrderResult',
+        params
+      })
     }
   }
 }
@@ -273,6 +271,54 @@ export default {
       border-left: 2px solid #dfdfdf;
       border-bottom: 2px solid #dfdfdf;
       border-right: 2px solid #dfdfdf;
+      .el-input{
+        width: 230px;
+      }
+      .otherStyle{
+        img{
+            vertical-align: top;
+            margin-top: 6px;
+          }
+        .el-input{
+          margin-right: 10px;
+        }
+        .changeBtn.el-button{
+          margin-left: 10px;
+          padding: 0;
+          border: none;
+          font-size: 16px;
+          color: #006fd8;
+          text-decoration: underline;
+        }
+        .changeBtn.el-button:focus, .changeBtn.el-button:hover{
+            color: #006fd8;
+            border-color: #fff;
+            background-color: #fff;
+        }
+      }
+      .otherStyle.el-col-12{
+          width: 500px;
+      }
+      .otherStyle.el-col-14{
+        width: 558px;
+        margin-right: 0px;
+        margin-left: 20px;
+        .el-input{
+          width: 230px;
+          margin-right: 15px;
+        }
+        .el-form-item__content{
+        line-height: 42px;
+        }
+        .el-input__inner{
+          text-align: left;
+          padding: 0 0 0 8px;
+          color: #b3b3b3;
+          font-family: '宋体';
+          font-size: 18px;
+          border-radius: 0px;
+        }
+      }
       .el-form-item__content{
         line-height: 42px;
       }
@@ -292,14 +338,16 @@ export default {
         }
       }
       .busi-btn{
+        vertical-align: top;
         padding: 0 18px;
         height: 36px;
+        width: 108px;
         background: url('../../assets/images/net-order/bg-14.png') center no-repeat;
         background-size: 100% 100%;
         border: none;
         color: #ffffff;
         line-height: 36px;
-        font-size: 18px;
+        font-size: 15px;
         margin-top: 3px;
         cursor: pointer;
         text-align: center;
@@ -352,9 +400,6 @@ export default {
     .shopMsg_all{
         padding-left: 52px;
         padding-top: 60px;
-        .el-row{
-          margin-bottom: 15px;
-        }
         .el-col-24{
           .el-form-item__label{
             text-align: left;
@@ -375,8 +420,8 @@ export default {
             font-style: normal;
           }
         }
-        .el-col-12{
-          margin-right: 127px;
+        .el-col-12,.el-col-10,.el-col-14{
+          margin-right: 110px;
           width: 385px;
           line-height: 42px;
           margin-bottom: 5px;
@@ -389,6 +434,9 @@ export default {
           .el-form-item__content{
             font-size: 18px;
           }
+        }
+        .el-col-10{
+          margin-right: 90px;
         }
     }
   }

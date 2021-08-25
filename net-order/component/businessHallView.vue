@@ -9,13 +9,13 @@
       <el-row>
         <el-col :span="24">
           <el-form-item>
-            <el-button v-for="(o,index) in 13" :key="o" type="primary" :class="['cityBtn',{selectedBtn:currentIndex === index}]" @click="handleCityBtn(index)">{{ o }}</el-button>
+            <el-button v-for="(o,index) in 13" :key="o" type="primary" :class="['cityBtn',{selectedBtn: currentIndex === index}]" @click="handleCityBtn(index)">{{ o }}</el-button>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row class="searchRow">
         <el-form-item>
-          <el-input v-model="queryParam.gradeName" placeholder="搜索营业厅" class="searchInput" prefix-icon="el-icon-search" suffix-icon="el-icon-circle-close" @keyup.enter.native.prevent="handleEnterSearch"></el-input>
+          <el-input v-model="queryParam.gradeName" clearable placeholder="搜索营业厅" class="searchInput" prefix-icon="el-icon-search" @keyup.enter.native.prevent="handleEnterSearch"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button
@@ -40,7 +40,7 @@
       >
         <el-table-column label="营业厅名称" prop="hallName" width="250">
           <template slot-scope="testData">
-            <el-radio v-model="form.hallName" :label="testData.row.hallName"></el-radio>
+            <el-radio v-model="form.hallName" :label="testData.row.hallName" @change="selectedRadio()"></el-radio>
           </template>
         </el-table-column>
         <el-table-column label="地址" prop="address" width="460"> </el-table-column>
@@ -71,7 +71,7 @@ export default {
   },
   data() {
     return {
-      currentIndex:0,
+      currentIndex: 0,
       form: {
         hallName: '',
         address: '',
@@ -191,6 +191,9 @@ export default {
     // }
   },
   methods: {
+    selectedRadio() {
+      console.log('aaa')
+    },
     selectCurrentRow(val) {
       this.$emit('changeRow', JSON.parse(JSON.stringify(val)))
     },
@@ -215,6 +218,7 @@ export default {
       this.handleQuery()
     },
     handleSearch(pkgIds) {
+      console.log('查询')
       this.pageData.pageNum = 1
       this.queryParam.pageNum = 1
       this.handleQuery(pkgIds)
@@ -260,10 +264,9 @@ export default {
         }
       }
     },
-
     // 切换城市
-    handleCityBtn(index){
-      this.currentIndex = index;
+    handleCityBtn(index) {
+      this.currentIndex = index
     }
   }
 }
