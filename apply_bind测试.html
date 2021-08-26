@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+	// var sum = function(x,y) {
+	// 	console.log(x,y)
+	// }
+
+	// var foo = Function.apply.bind(sum,null)
+	// console.info(foo)
+	// foo([10,20]);
+	// 
+	function getY(x) { 
+		 return new Promise( function(resolve,reject){ 
+		 setTimeout( function(){ 
+		 resolve( (3 * x) - 1 ); 
+		 }, 100 ); 
+		 } ); 
+		} 
+	function foo(bar,baz){
+		var x = bar * baz;
+		return [Promise.resolve(x),getY(x)]
+	}
+	Promise.all(foo(10,20)).then(console.log(arguments))
+	</script>
+</body>
+</html>
