@@ -4,7 +4,7 @@
       <!--右侧内容开始-->
       <div class="layout">
         <div class="wrap">
-            <!-- 标题 -->
+          <!-- 标题 -->
           <div class="yycg_top">
             <div class="bt">恭喜，预约单提交成功！</div>
             <div class="fr">
@@ -15,7 +15,7 @@
           <div class="yycg_bottom">
             <div class="yycg_xq">
               <span class="fl">您预约单号为：<em class="j-custOrderNo">DD202108251629433680000057290294</em>，您的预约号为：<em class="j-telCode">18357193647</em>，您的查询密码为：<em class="j-password">210105</em></span>
-              <router-link :to="{path:'/school/netOrder'}">查看预约单详情&gt;&gt;</router-link>
+              <router-link :to="{path:'/school/netOrderDetail'}">查看预约单详情&gt;&gt;</router-link>
             </div>
             <div class="yycg_xq">
               <span class="fl">自取商品：请您在48小时内前往您预约的营业厅办理相关事宜</span>
@@ -32,9 +32,9 @@
 
 <script>
 export default {
-  props:{
+  props: {
     'numbers': String,
-    'phone': Number,
+    'phone': Number
   },
   data() {
     return {
