@@ -286,6 +286,7 @@ export default {
     border-radius: 5px;
     .el-button+.el-button{
       margin-left: 0px;
+      transition-property: none;
     }
     .el-form-item__content{
       padding-left: 0px;
@@ -334,10 +335,12 @@ export default {
       margin-right: 20px;
       margin-top: 10px;
       cursor: pointer;
+      transition-property: none;
     }
     .selectedBtn{
       border-color: #ff5c00;
       background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-18.png) right bottom no-repeat;
+      transition-property: none;
     }
     .tableView{
       padding: 20px 0px;

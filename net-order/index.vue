@@ -31,13 +31,12 @@
                 <el-row>
                   <el-col :span="24">
                     <div>
-                      <el-form-item label="选择地市：" prop="num">
+                      <el-form-item label="选择地市：" prop="city">
                         <el-radio-group
-                          v-for="(item,index) in cities"
-                          id="city"
-                          :key="item.value"
+                          v-for="(item,index) in citys"
+                          :key="item.id"
                           v-model="form.city"
-                          @change="selectCityId()"
+                          @change="selectRule([item,'city'])"
                         >
                           <!-- :class="{selectBgc: currentIndex === index}" -->
                           <el-radio-button :label="item.label" @click="handleSelectBtn(index)"></el-radio-button>
@@ -49,15 +48,14 @@
                 <el-row>
                   <el-col :span="24">
                     <div>
-                      <el-form-item label="预存范围：" prop="num">
+                      <el-form-item label="预存范围：" prop="deposits">
                         <el-radio-group
-                          v-for="(item,index) in cities"
-                          id="city"
-                          :key="item.value"
-                          v-model="form.priceScope"
-                          @change="selectCityId()"
+                          v-for="(item,index) in resDate.deposits"
+                          :key="item"
+                          v-model="form.deposits"
+                          @change="selectRule([item,'deposits'])"
                         >
-                          <el-radio-button :label="item.label" @click="handleSelectBtn(index)"></el-radio-button>
+                          <el-radio-button :label="item" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
                       </el-form-item>
                     </div>
@@ -66,9 +64,9 @@
                 <el-row>
                   <el-col :span="24">
                     <div>
-                      <el-form-item label="保底消费：" prop="num">
-                        <el-radio-group v-for="(item,index) in cities" id="city" :key="item.value" v-model="form.consume" @change="selectCityId()">
-                          <el-radio-button :label="item.label" @click="handleSelectBtn(index)"></el-radio-button>
+                      <el-form-item label="保底消费：" prop="baseRulePrice">
+                        <el-radio-group v-for="(item,index) in resDate.baseRulePrice" :key="item" v-model="form.baseRulePrice" @change="selectRule([item,'baseRulePrice'])">
+                          <el-radio-button :label="item" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
                       </el-form-item>
                     </div>
@@ -77,9 +75,9 @@
                 <el-row>
                   <el-col :span="24">
                     <div>
-                      <el-form-item label="靓号规则：" prop="num">
-                        <el-radio-group v-for="(item,index) in cities" id="city" :key="item.value" v-model="form.rule" @change="selectCityId()">
-                          <el-radio-button :label="item.label" @click="handleSelectBtn(index)"></el-radio-button>
+                      <el-form-item label="靓号规则：" prop="numRule">
+                        <el-radio-group v-for="(item,index) in resDate.numRule" :key="item" v-model="form.numRule" @change="selectRule([item,'numRule'])">
+                          <el-radio-button :label="item" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
                       </el-form-item>
                     </div>
@@ -88,24 +86,10 @@
                 <el-row>
                   <el-col :span="24">
                     <div>
-                      <el-form-item label="选择号段：" prop="num">
-                        <el-radio-group v-for="(item,index) in cities" id="city" :key="item.value" v-model="form.segment" @change="selectCityId()">
-                          <el-radio-button :label="item.label" @click="handleSelectBtn(index)"></el-radio-button>
+                      <el-form-item label="选择号段：" prop="telePer">
+                        <el-radio-group v-for="(item,index) in resDate.telePer" :key="item" v-model="form.segment" @change="selectRule([item,'segment'])">
+                          <el-radio-button :label="item" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <!-- <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button>
-                        <el-radio-button label="123"></el-radio-button> -->
                       </el-form-item>
                     </div>
                   </el-col>
@@ -160,7 +144,7 @@
               <el-row>
                 <el-button v-for="(item,index) in orderRule" :key="item.value" :class="['ruleBtn', {init: item.state}, {up: isUp === index }, {down: isDown === index }]" @click="selectRuleBtn(index,item)">{{ item.value }}</el-button>
                 <!-- 分页信息 -->
-                <div class="pagination-container">
+                <!-- <div class="pagination-container">
                   <el-pagination
                     background
                     layout="slot, prev, pager, next"
@@ -172,18 +156,18 @@
                   >
                     <span>共有{{ pageData.total }}个号码符合要求</span>
                   </el-pagination>
-                </div>
+                </div> -->
               </el-row>
             </div>
             <div class="t-hmWrap">
               <el-row>
-                <el-col v-for="o in 24" :key="o" :span="6">
+                <el-col v-for="item in pageData.results" :key="item.teleCode" :span="6">
                   <el-card class="N_hmPart" shadow="never">
-                    <div class="n_hover" @click="selectNum(o)">
-                      <h6>188<u class="ucolor1">8888</u>8888</h6>
+                    <div class="n_hover" @click="selectNum(item)">
+                      <h6>{{ item.teleCode.substring(0,3) }}<u class="ucolor1">{{ item.teleCode.substring(3,7) }}</u>{{ item.teleCode.substring(7,11) }}</h6>
                       <div class="clearfix">
                         <span class="fl partInfor">
-                          预&nbsp;存:￥<u>500</u>
+                          预&nbsp;存:￥<u>{{ item.deposits }}</u>
                         </span>
                         <span class="fr partBtn">
                           <a href="javascript:;" telcode="18458421258" deposits="500" rulebasefee="98" inlen="60">
@@ -193,14 +177,12 @@
                       </div>
                       <div class="partDiv clearfix">
                         <span class="fl partInfor">
-                          保&nbsp;底：￥
-                          <u>98/月</u>
+                          保&nbsp;底：￥<u>{{ item.ruleBaseFee }}</u>
                         </span>
                       </div>
                       <div class="partDiv clearfix">
                         <span class="fl partInfor">
-                          合&nbsp;约期：￥
-                          <u>60/月</u>
+                          合&nbsp;约期：￥<u>{{ item.rulePrice }}</u>
                         </span>
                       </div>
                     </div>
@@ -224,14 +206,13 @@
               >
                 <el-pagination
                   background
-                  layout="prev, pager, next,slot, jumper"
+                  layout="prev, pager, next, jumper"
                   :page-size="pageData.pageSize"
                   :current-page="pageData.pageNum"
                   :page-count="pageData.total"
                   @size-change="handleSizeChange"
                   @current-change="handleCurrentChange"
                 >
-                  <span>共{{ 5 }}页</span>
                 </el-pagination>
               </div>
             </div>
@@ -243,6 +224,9 @@
 </template>
 <script>
 import SchoolApi from '@api/modules/school'
+import CommonApi from '@api/modules/common'
+
+import NetOrderApi from './api/net-order'
 
 export default {
   data() {
@@ -265,11 +249,18 @@ export default {
           state: true
         }],
       form: {
-        city: '', // 选择地市
-        priceScope: '', // 预存范围
-        consume: '', // 保底消费
-        rule: '', // 规则
-        segment: '' // 号段
+        cityId: '', // 地市id
+        deposits: '', // 预存范围
+        baseRulePrice: '', // 保底消费
+        numRule: '', // 规则
+        segment: '', // 号段
+        sort: '', // 排序
+        telCodePer: '',
+        telCode: '',
+        noFourNumber: 'N'
+        // sort: "",
+        // page: "1",
+        // size: "24"
       },
       pageData: {
         total: 0,
@@ -277,34 +268,18 @@ export default {
         pageNum: 1,
         pageSize: 24
       },
+      queryParam: {
+        num: '',
+        deposits: '',
+        baseRulePrice: '',
+        tenor: '',
+        pageNum: 1,
+        pageSize: 24
+      },
+      citys: [], // 城市列表
+      resDate: {}, // 号码规则信息列表
       telInfoList: [], // 号码信息列表
       selectedNum: '', // 选中的号码
-      cities: [
-        {
-          value: 'Beijing',
-          label: '北京'
-        },
-        {
-          value: 'Shanghai',
-          label: '上海'
-        },
-        {
-          value: 'Nanjing',
-          label: '南京'
-        },
-        {
-          value: 'Chengdu',
-          label: '成都'
-        },
-        {
-          value: 'Shenzhen',
-          label: '深圳'
-        },
-        {
-          value: 'Guangzhou',
-          label: '广州'
-        }
-      ],
       value: ''
     }
   },
@@ -314,11 +289,25 @@ export default {
     }
   },
   mounted() {
+    this.qryCitys()
+    // 根据城市id请求相应号码规则
+    this.qryNumFilterCond()
+
+    // 根据选择的号码规则请求号码数据
     this.qryNumList()
   },
   methods: {
-    selectCityId() {
-      console.log(this.form)
+    selectRule(arr) {
+      const [item, str] = arr
+      console.log(item, str)
+      if (str === 'city') {
+        this.form.cityId = item.value
+        // 选择城市 -> 规则
+        this.qryNumFilterCond()
+      }
+      // 规则 -> 更新符合规则号码
+      this.qryNumList()
+      // this.form.cityId = item[1].value
     },
     changeSearch() {
       this.searchFlag = !this.searchFlag
@@ -350,27 +339,42 @@ export default {
     },
     handleSizeChange(size) {
       this.queryParam.pageSize = size
-      this.handleQuery()
+      this.qryNumList()
     },
     handleCurrentChange(currentPage) {
       this.queryParam.pageNum = currentPage
       this.pageData.pageNum = currentPage
-      this.handleQuery()
+      this.qryNumList()
     },
-
     handleResetQuery() {
       // 号码 预存 保底 合约期
       this.queryParam = {
         num: '',
-        priceScope: '',
-        consume: '',
+        deposits: '',
+        baseRulePrice: '',
         tenor: '',
         pageNum: 1,
         pageSize: 10
       }
     },
+    qryCitys() {
+      const params = {
+        code: 'CITY_CODE'
+      }
+      CommonApi.qryDict(params).then(resp => {
+        const data = resp.data
+        data.forEach((item, inx, arr) => {
+          if (item.value === '000') {
+            arr.splice(inx, 1)
+          }
+        })
+        console.log(data)
+        this.citys = data
+      })
+    },
     // 调用接口搜索号码
     qryNumList() {
+      console.log(this.pageData.pageNum);
       const params = {
         suitId: '99',
         cityId: '571',
@@ -398,12 +402,26 @@ export default {
             telInfo.selected = false
             this.telInfoList.push(telInfo)
           }
+          this.pageData.results = data.telInfoList
+          console.log(this.pageData.results)
           this.pageData.total = data.total || 0
 
           // this.noTelData = false
         } else {
           // this.noTelData = true
         }
+      })
+    },
+    qryNumFilterCond() {
+      const params = {
+        cityId: this.form.cityId || '402881ea3286d488013286d756720002'
+      }
+      NetOrderApi.qryNumFilterCond(params).then(resp => {
+        // this.resDate = resp.resdata
+        this.resDate = resp.resdata.map(item => {
+          item.unshift('全部')
+        })
+        console.log(this.resDate)
       })
     },
     // 选择号码
@@ -508,12 +526,13 @@ export default {
         .jq_input{
           float:left;
           margin-right:30px;
+          margin-left: 20px;
           .el-input__inner{
              text-align: center;
              padding: 0;
              width: 32px;
              height: 32px;
-             margin-left: 20px;
+             /* margin-left: 20px; */
           }
         }
         .tabBtn{
@@ -731,14 +750,14 @@ export default {
       // 分页样式
       .pagination-container{
         float: right;
-        padding: 10px 18px 0 0;
-        .el-pagination button, .el-pagination span:not([class*=suffix]){
+        padding: 20px 18px 0 30px;
+        /* .el-pagination button, .el-pagination span:not([class*=suffix]){
           font-size: 18px;
         }
         .el-pager li{
           margin: 0;
           font-size: 20px;
-        }
+        } */
       }
     }
   }
