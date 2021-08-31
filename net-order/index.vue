@@ -1,5 +1,5 @@
 <template>
-  <div class="bgc">
+  <div v-loading="loading" class="bgc" element-loading-text="拼命加载中">
     <div class="wrap">
       <div id="breadNav" class="clearfix">
         <el-breadcrumb separator-class="el-icon-arrow-right" class="bread-crumd">
@@ -39,7 +39,7 @@
                           @change="selectRule([item,'city'])"
                         >
                           <!-- :class="{selectBgc: currentIndex === index}" -->
-                          <el-radio-button :label="item.label" @click="handleSelectBtn(index)"></el-radio-button>
+                          <el-radio-button :label="item.label" :class="{defaultSelect:index === defaultNum}" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
                       </el-form-item>
                     </div>
@@ -102,25 +102,25 @@
                 <el-col :span="24">
                   <el-form-item label="号码搜索：" prop="num" class="n_search">
                     <div v-if="searchFlag" class="mh_input">
-                      <el-input v-model="form.segment" placeholder="试试输入你想要的号码"></el-input>
+                      <el-input v-model="serchValue" placeholder="试试输入你想要的号码"></el-input>
                     </div>
                     <div v-else class="jq_input">
                       <!-- 数组存 -->
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[0]" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[1]" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[2]" maxlength="1" class="n-ipt"></el-input>
                       <span class="n-spl"></span>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[3]" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[4]" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[5]" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[6]" maxlength="1" class="n-ipt"></el-input>
                       <span class="n-spl"></span>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
-                      <el-input v-model="form.segment" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[7]" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[8]" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[9]" maxlength="1" class="n-ipt"></el-input>
+                      <el-input v-model="prValue[10]" maxlength="1" class="n-ipt"></el-input>
                     </div>
-                    <el-button type="primary" size="medium" plain class="searchBtn">搜索</el-button>
+                    <el-button type="primary" size="medium" plain class="searchBtn" @click="onSearch()">搜索</el-button>
                     <el-button type="primary" plain class="tabBtn" style="" @click="changeSearch">{{ changeBtnName }}</el-button>
                   </el-form-item>
                   <div class="xh_gmyy_img" style="display: inline-block; float: right">
@@ -129,7 +129,7 @@
                       title="怎么预约？"
                       width="200"
                       trigger="click"
-                      content="选择您喜欢的号码，填写领取号码时出示的证件信息，就可以到您选择的营业厅购买您预约的号码，您预约的号码我们将为您保留自预约时间起的48小时。"
+                      :content="makeTipText"
                     >
                       <el-button slot="reference" class="hm_zmyy">怎么预约？</el-button>
                     </el-popover>
@@ -207,8 +207,8 @@
                 <el-pagination
                   background
                   layout="prev, pager, next, jumper"
-                  :page-size="pageData.pageSize"
-                  :current-page="pageData.pageNum"
+                  :page-size="size"
+                  :current-page="page"
                   :page-count="pageData.total"
                   @size-change="handleSizeChange"
                   @current-change="handleCurrentChange"
@@ -225,13 +225,14 @@
 <script>
 import SchoolApi from '@api/modules/school'
 import CommonApi from '@api/modules/common'
-
-import NetOrderApi from './api/net-order'
+// import NetOrderApi from './api/net-order'
 
 export default {
   data() {
     return {
+      loading: false,
       searchFlag: true,
+      defaultNum: 0,
       currentIndex: 0,
       isUp: 999,
       isDown: 999,
@@ -249,33 +250,26 @@ export default {
           state: true
         }],
       form: {
-        cityId: '', // 地市id
+        cityId: '', // 归属地市id
+        suiteId: '', // 营销包ID
         deposits: '', // 预存范围
         baseRulePrice: '', // 保底消费
-        numRule: '', // 规则
+        inLen: '', // 合约期
+        numRule: '', // 号码规则
         segment: '', // 号段
         sort: '', // 排序
-        telCodePer: '',
-        telCode: '',
-        noFourNumber: 'N'
-        // sort: "",
-        // page: "1",
-        // size: "24"
+        telCodePer: '', // 号码号段
+        telCode: '', // 精准搜索号码片段
+        noFourNumber: 'N' // 是否不含4， 枚举值，Y:不含4
       },
       pageData: {
         total: 0,
-        results: [],
-        pageNum: 1,
-        pageSize: 24
+        results: []
       },
-      queryParam: {
-        num: '',
-        deposits: '',
-        baseRulePrice: '',
-        tenor: '',
-        pageNum: 1,
-        pageSize: 24
-      },
+      page: 1,
+      size: 24,
+      serchValue: '', // 搜索值
+      prValue: [], // 精确值
       citys: [], // 城市列表
       resDate: {}, // 号码规则信息列表
       telInfoList: [], // 号码信息列表
@@ -286,6 +280,9 @@ export default {
   computed: {
     changeBtnName: function() {
       return this.searchFlag === true ? '精确搜索' : '模糊搜索'
+    },
+    makeTipText: function(){
+      return `                       选择您喜欢的号码，填写领取号码时出示的证件信息，就可以到您选择的营业厅购买您预约的号码，您预约的号码我们将为您保留自预约时间起的48小时。`
     }
   },
   mounted() {
@@ -300,19 +297,21 @@ export default {
     selectRule(arr) {
       const [item, str] = arr
       console.log(item, str)
+      this.defaultNum = ''
       if (str === 'city') {
         this.form.cityId = item.value
         // 选择城市 -> 规则
         this.qryNumFilterCond()
       }
       // 规则 -> 更新符合规则号码
-      this.qryNumList()
+      // this.qryNumList()
       // this.form.cityId = item[1].value
     },
     changeSearch() {
       this.searchFlag = !this.searchFlag
     },
     selectRuleBtn(index, item) {
+      // 控制颜色及图标的改变
       if (item.state) {
         if (this.isUp === index) {
           this.isUp = ''
@@ -332,31 +331,54 @@ export default {
           this.isDown = index
         }
       }
+      // 规则请求
+      if (index === 0) {
+        if (item.state) {
+          this.form.sort = 'HD|D'
+        } else {
+          this.form.sort = 'HD|U'
+        }
+      }
+      if (index === 1) {
+        if (item.state) {
+          this.form.sort = 'BP|D'
+        } else {
+          this.form.sort = 'BP|U'
+        }
+      }
+      if (index === 2) {
+        if (item.state) {
+          this.form.sort = 'P|D'
+        } else {
+          this.form.sort = 'P|U'
+        }
+      }
+      console.log(this.form.sort)
+      this.qryNumList()
     },
     // 点击刷新请求 改变背景色
     handleSelectBtn(index) {
       this.currentIndex = index
     },
     handleSizeChange(size) {
-      this.queryParam.pageSize = size
+      this.size = size
       this.qryNumList()
     },
     handleCurrentChange(currentPage) {
-      this.queryParam.pageNum = currentPage
-      this.pageData.pageNum = currentPage
+      this.page = currentPage
       this.qryNumList()
     },
-    handleResetQuery() {
-      // 号码 预存 保底 合约期
-      this.queryParam = {
-        num: '',
-        deposits: '',
-        baseRulePrice: '',
-        tenor: '',
-        pageNum: 1,
-        pageSize: 10
-      }
-    },
+    // handleResetQuery() {
+    //   // 号码 预存 保底 合约期
+    //   this.form = {
+    //     num: '',
+    //     deposits: '',
+    //     baseRulePrice: '',
+    //     tenor: '',
+    //     pageNum: 1,
+    //     pageSize: 10
+    //   }
+    // },
     qryCitys() {
       const params = {
         code: 'CITY_CODE'
@@ -372,16 +394,48 @@ export default {
         this.citys = data
       })
     },
+    // 搜索框搜索事件
+    onSearch() {
+      if (!this.searchFlag) {
+        console.log(this.prValue)
+        if (this.prValue.length !== 0) {
+          const arr = Array.of('|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|')
+          this.form.telCode = arr.map((item, index) => {
+            if (this.prValue[index]) {
+              item = this.prValue[index]
+            }
+            return item
+          }).join('')
+          this.page = 1
+          this.qryNumList()
+        } else {
+          this.qryNumList()
+        }
+      } else {
+        if (this.serchValue) {
+          this.form.telCode = this.serchValue
+          this.page = 1
+          this.qryNumList()
+        } else {
+          this.qryNumList()
+        }
+      }
+    },
     // 调用接口搜索号码
     qryNumList() {
-      console.log(this.pageData.pageNum);
+      this.loading = true
       const params = {
-        suitId: '99',
-        cityId: '571',
-        page: this.pageData.pageNum,
-        size: this.pageData.pageSize
+        cityId: this.form.cityId,
+        deposits: this.form.deposits,
+        numRule: this.form.numRule,
+        telCodePer: this.form.telCodePer,
+        telCode: this.form.telCode,
+        baseRulePrice: this.form.baseRulePrice,
+        noFourNumber: this.form.noFourNumber,
+        sort: this.form.sort,
+        page: this.page,
+        size: this.size
       }
-
       // if (this.serchValue) {
       //   if (!/^[0-9]+$/.test(this.value)) {
       //     this.Dialog = true
@@ -391,38 +445,41 @@ export default {
       //   }
       // }
       this.telInfoList = []
-      // params.telCode = this.serchValue
       SchoolApi.searchNum(params).then((resp) => {
-        const data = resp.data
+        this.loading = false
         console.log(resp)
-        if (data.telInfoList && data.telInfoList.length > 0) {
-          let telInfo = {}
-          for (let i = 0; i < data.telInfoList.length; i++) {
-            telInfo = data.telInfoList[i]
-            telInfo.selected = false
-            this.telInfoList.push(telInfo)
-          }
-          this.pageData.results = data.telInfoList
-          console.log(this.pageData.results)
-          this.pageData.total = data.total || 0
+        this.pageData.total = resp.data.total || 0
+        this.pageData.results = resp.data.telInfoList
+        // if (resp.data.telInfoList && resp.data.telInfoList.length > 0) {
+        //   let telInfo = {}
+        //   for (let i = 0; i < resp.data.telInfoList.length; i++) {
+        //     telInfo = data.telInfoList[i]
+        //     telInfo.selected = false
+        //     this.telInfoList.push(telInfo)
+        //   }
+        //   console.log(this.pageData.results)
 
-          // this.noTelData = false
-        } else {
-          // this.noTelData = true
-        }
+        //   this.noTelData = false
+        // } else {
+        //   this.noTelData = true
+        // }
       })
+        .catch((e) => {
+          this.loading = false
+        })
     },
     qryNumFilterCond() {
       const params = {
         cityId: this.form.cityId || '402881ea3286d488013286d756720002'
       }
-      NetOrderApi.qryNumFilterCond(params).then(resp => {
-        // this.resDate = resp.resdata
-        this.resDate = resp.resdata.map(item => {
-          item.unshift('全部')
-        })
-        console.log(this.resDate)
-      })
+      console.log(params)
+      // NetOrderApi.qryNumFilterCond(params).then(resp => {
+      //   // this.resDate = resp.resdata
+      //   this.resDate = resp.resdata.map(item => {
+      //     item.unshift('全部')
+      //   })
+      //   console.log(this.resDate)
+      // })
     },
     // 选择号码
     selectNum(o) {
@@ -442,7 +499,25 @@ export default {
 <style lang="scss">
 .bgc{
   background-color: #fff;
-}
+  /*elementui loading css 覆盖 开始*/
+  .el-loading-spinner .circular{
+    width: 42px;
+    height: 42px;
+    animation: loading-rotate 2s linear infinite;
+    display: none;
+  }
+  .el-loading-spinner{
+    background: url('../../assets/images/net-order/wating.gif') no-repeat;
+    background-size: 80px 80px;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 50%;
+    left: 45%;
+  }
+  .el-loading-mask{
+    background-color: rgba(255,255,255,.0);
+  }
 .wrap {
   /* background: #fff; */
   font-size: 12px;
@@ -470,6 +545,13 @@ export default {
       font-size: 18px !important;
       .propList{
         padding-right: 60px;
+      }
+      .defaultSelect{
+        color: #FFF;
+        background-color: #FF8800;
+        border-color: #FF8800;
+        box-shadow: -1px 0 0 0#FF8800;
+        border-radius: 0;
       }
       .el-radio-button__orig-radio:checked+.el-radio-button__inner{
         color: #FFF;
@@ -765,5 +847,6 @@ export default {
     color: #fff;
     background-color: #FF8800;
   }
+}
 }
 </style>

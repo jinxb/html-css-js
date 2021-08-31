@@ -3,7 +3,7 @@
     <div class="mautoall">
       <!--右侧内容开始-->
       <div class="layout">
-        <img src="http://www.zj.10086.cn/pcweb/shop/images/pic-04.jpg" width="100%">
+        <img :src="require('@assets/images/net-order/pic-04.jpg')" width="100%">
         <el-form ref="form" :model="form" :inline="true">
           <div class="numBox">
             <!-- 标题 -->
@@ -156,7 +156,7 @@ export default {
           .el-button{
             width: 116px;
             height: 38px;
-            background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-22.jpg) center no-repeat;
+            background: url('../../assets/images/net-order/bg-22.jpg') center no-repeat;
             margin-left: 88px;
             cursor: pointer;
           }

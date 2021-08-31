@@ -4,60 +4,58 @@
       <!--右侧内容开始-->
       <div class="layout">
         <div class="N_wrapCon">
-    		<div class="ddxq_all">
-                <div class="ddxq_top">
-                    订单详情
-                </div>
-                <div class="ddxq_content">
-                    <div class="content_list">
-                        <span class="bt jg">您的订单状态：<em class="j-ddzt">待办理</em></span>
-                    </div>
-                    <div class="content_list">
-                        <span class="bt">订单明细</span>
-                        <div class="content_ddmx clearw j-ddmx">
-                            
-                        <span class="fl">订单编号：DD202108270937344310000057305324</span><span class="fl">订单类型：预约订单</span><span class="fl">下单时间：2021-08-27 09:37:34</span></div>
-                    </div>
-                    <div class="content_list">
-                        <span class="bt">预约人信息</span>
-                        <div class="content_yyrxx j-ddyyrxx">
-                            
-                        <p>姓 名：欧****</p><p>联系电话：132****6856</p><p>预约人身份证号码：352224********2025</p><p>自取营业厅：杭州上城天城路营业厅</p><p>营业厅地址：江干区天城路207号</p><p>营业厅联系电话：</p><p>营业时间：周一、周二、周三、周四、周五、周六、周日 09:00-12:00 12:00-18:00</p></div>
-                    </div>
-                    <div class="content_list">
-                        <span class="bt">商品信息</span>
-                        <div class="content_spxx top clearw">
-                            <div class="fl left">
-                                商品
-                            </div>
-                            <div class="fl right">
-                                数量
-                            </div>
-                        </div>
-                        <div class="content_spxx bottom clearw">
-                            <div class="fl left clearw">
-                                <div class="fl pthm">
-                                    普通号码
-                                </div>
-                                <div class="fl tel j-telnum">
-                                    号码：<em>15158841402</em>
-                                </div>
-                            </div>
-                            <div class="fl right">
-                                1
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="ddxq_btn clearw">
-                    <div class="fl j-ddxqfh">
-                        返回
-                    </div>
-                    <div class="fr j-ddxqqxyy" style="display: none;">
-                        取消预约
-                    </div>
-                </div>
+          <div class="ddxq_all">
+            <div class="ddxq_top">
+              订单详情
             </div>
+            <div class="ddxq_content">
+              <div class="content_list">
+                <span class="bt jg">您的订单状态：<em class="j-ddzt">待办理</em></span>
+              </div>
+              <div class="content_list">
+                <span class="bt">订单明细</span>
+                <div class="content_ddmx clearw j-ddmx">
+                  <span class="fl">订单编号：DD202108270937344310000057305324</span><span class="fl">订单类型：预约订单</span><span class="fl">下单时间：2021-08-27 09:37:34</span></div>
+              </div>
+              <div class="content_list">
+                <span class="bt">预约人信息</span>
+                <div class="content_yyrxx j-ddyyrxx">
+                  <p>姓 名：欧****</p><p>联系电话：132****6856</p><p>预约人身份证号码：352224********2025</p><p>自取营业厅：杭州上城天城路营业厅</p><p>营业厅地址：江干区天城路207号</p><p>营业厅联系电话：</p><p>营业时间：周一、周二、周三、周四、周五、周六、周日 09:00-12:00 12:00-18:00</p></div>
+              </div>
+              <div class="content_list">
+                <span class="bt">商品信息</span>
+                <div class="content_spxx top clearw">
+                  <div class="fl left">
+                    商品
+                  </div>
+                  <div class="fl right">
+                    数量
+                  </div>
+                </div>
+                <div class="content_spxx bottom clearw">
+                  <div class="fl left clearw">
+                    <div class="fl pthm">
+                      普通号码
+                    </div>
+                    <div class="fl tel j-telnum">
+                      号码：<em>15158841402</em>
+                    </div>
+                  </div>
+                  <div class="fl right">
+                    1
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="ddxq_btn clearw">
+              <div class="fl j-ddxqfh">
+                返回
+              </div>
+              <div class="fr j-ddxqqxyy" style="display: none;">
+                取消预约
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -115,7 +113,7 @@ body{
                 border-radius: 7px 7px 0 0;
                 padding-left: 15px;
                 border-bottom: 2px solid #cdcdcb;
-                background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-24.jpg) left center repeat-x;
+                background: url('../../assets/images/net-order/bg-24.jpg') left center repeat-x;
             }
             .ddxq_content {
                 padding: 22px 62px;
@@ -163,7 +161,7 @@ body{
                     }
                   }
                   .content_spxx {
-                      background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-25.png) left center repeat-x;
+                      background: url('../../assets/images/net-order/bg-25.png') left center repeat-x;
                       .fl.left {
                           width: 60%;
                       }
@@ -186,7 +184,6 @@ body{
                       text-align: center;
                     }
                   }
-                  
                   .content_spxx.bottom {
                       border-bottom: 2px solid #d6d6d6;
                       margin-bottom: 16px;
@@ -224,7 +221,7 @@ body{
                     color: #ffffff;
                     text-align: center;
                     line-height: 46px;
-                    background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-26.jpg) center no-repeat;
+                    background: url('../../assets/images/net-order/bg-26.jpg') center no-repeat;
                     box-sizing: border-box;
                     border: 2px solid #e34f2b;
                     border-radius: 7px;
@@ -235,7 +232,4 @@ body{
       }
   }
 }
-
-
-
 </style>

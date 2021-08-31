@@ -60,14 +60,14 @@
                   </el-col>
                   <el-col :span="12">
                     <el-form-item label="身份证号码：" prop="idCard">
-                      <el-input v-model="form.idCard" placeholder="请输入身份证号码"></el-input>
+                      <el-input v-model="form.idCard" placeholder="请输入身份证号码" :maxlength="18"></el-input>
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row>
                   <el-col :span="10">
                     <el-form-item label="联系电话：" prop="number">
-                      <el-input v-model="form.number" placeholder="请输入电话号码"></el-input>
+                      <el-input v-model="form.number" placeholder="请输入电话号码" :maxlength="11"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="14" class="otherStyle">
@@ -77,7 +77,7 @@
                         name="authCode"
                         type="text"
                         placeholder="请输入图形验证码"
-                        :maxlength="5"
+                        :maxlength="4"
                         @keyup.enter.native="handleLogin"
                       ></el-input>
                       <img class="fl j-changeyzm j-myyzm" src="//www.zj.10086.cn/shop-front-web/sinoaptcha1.jpg" height="29" title="看不清？点击图片重新获取验证码！" align="middle">
@@ -325,7 +325,7 @@ export default {
       .el-input__inner{
         text-align: left;
         padding: 0 0 0 8px;
-        color: #b3b3b3;
+        color: #3f3f3f;
         font-family: '宋体';
         font-size: 18px;
         border-radius: 0px;
@@ -334,7 +334,7 @@ export default {
         .el-input__inner{
           background: url('../../assets/images/net-order/bg-13.png') right bottom no-repeat;
           border: 1px solid #ff5c00;
-          color: #454545;
+          color: #3f3f3f;
         }
       }
       .busi-btn{
@@ -499,5 +499,4 @@ export default {
         padding-left: 54px;
       }
     }
-
 </style>

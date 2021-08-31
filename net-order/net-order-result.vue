@@ -65,14 +65,14 @@ export default {
         padding-left: 45px;
         padding-bottom: 40px;
         padding-right: 28px;
-        background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-16.jpg) left bottom repeat-x;
+        background: url('../../assets/images/net-order/bg-16.jpg') left bottom repeat-x;
         .bt {
             line-height: 82px;
             height: 82px;
             font-size: 44px;
             color: #eb6100;
             padding-left: 102px;
-            background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-23.png) left center no-repeat;
+            background: url('../../assets/images/net-order/bg-23.png') left center no-repeat;
         }
         .fr {
             float: right;

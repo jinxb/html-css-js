@@ -294,7 +294,7 @@ export default {
     .searchRow{
       height: 55px;
       padding-left: 0px;
-      background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-16.jpg) left bottom repeat-x;
+      background: url('../../../assets/images/net-order/bg-16.jpg') left bottom repeat-x;
       margin-bottom: 10px;
       .searchInput{
         .el-input__inner{
@@ -315,7 +315,7 @@ export default {
         color: #666;
         text-align: center;
         border: none;
-        background: url(http://www.zj.10086.cn/pcweb/shop/images/searchc_btn.png) 0 0 no-repeat;
+        background: url('../../../assets/images/net-order/searchc_btn.png') 0 0 no-repeat;
         float: left;
         cursor: pointer;
       }
@@ -327,7 +327,7 @@ export default {
       border-radius: 0;
       }
     .cityBtn{
-      background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-17.jpg) center no-repeat;
+      background: url('../../../assets/images/net-order/bg-17.jpg') center no-repeat;
       background-size: cover;
       width: 92px;
       height: 34px;
@@ -339,7 +339,7 @@ export default {
     }
     .selectedBtn{
       border-color: #ff5c00;
-      background: url(http://www.zj.10086.cn/pcweb/shop/images/bg-18.png) right bottom no-repeat;
+      background: url('../../../assets/images/net-order/bg-18.png') right bottom no-repeat;
       transition-property: none;
     }
     .tableView{

@@ -8,11 +8,11 @@ class netOrderApi{
    *  根据城市id请求相应号码规则
    */
    qryNumFilterCond(params) {
-    return request({
-      url: '',
-      method: 'post',
-      data: params
-    })
+    // return request({
+    //   url: '',
+    //   method: 'post',
+    //   data: params
+    // })
   }
   
 
