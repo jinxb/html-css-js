@@ -52,21 +52,14 @@
 </template>
 
 <script>
-// import packageApi from "./package-api";
+import CommonApi from '@api/modules/common'
+
 
 export default {
   props: {
-    cityInfo: {
-      type: Array,
-      default: () => {
-        return []
-      }
-    },
-    busiInfo: {
-      type: Array,
-      default: () => {
-        return []
-      }
+    cityId: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -173,14 +166,7 @@ export default {
     }
   },
   created() {
-    // this.$util.dictMap((fn, map) => {
-    //   this.regions = this._.sortBy(fn('CITY_CODE', map), ['sort'])
-    //   this.regions = this.regions.filter((region) => {
-    //     return region.value !== '000'
-    //   })
-    // })
-    // this.cityId && this.cityId !== '' && (this.queryParam.cityIds = this.cityId)
-    // this.cachePackages = this.packages
+    this.qryRegions()
     this.loading = true
   },
   mounted() {
@@ -267,7 +253,18 @@ export default {
     // 切换城市
     handleCityBtn(index) {
       this.currentIndex = index
-    }
+    },
+    qryRegions() {
+      console.log(this.cityId);
+      const params = {
+        cityId: this.cityId,
+        pkgId: ''
+      }
+      CommonApi.qryRegions(params).then((resp) => {
+        this.regions = resp.data
+        console.log(this.regions)
+      })
+    },
   }
 }
 </script>

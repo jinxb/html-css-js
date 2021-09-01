@@ -18,16 +18,16 @@
                     </el-form-item>
                   </el-col>
                   <el-col :span="12">
-                    <el-form-item label="号码归属：" prop="city">
-                      <span>{{ form.city }}</span>
+                    <el-form-item label="号码归属：" prop="cityName">
+                      <span>{{ form.cityName }}</span>
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-row>
                   <el-col :span="24">
-                    <el-form-item label="价格：" prop="price">
-                      <span class="fl j-numlistprice"><em class="dw rcl">￥</em><em class="jg rcl">{{ form.price }}</em>元</span>
-                      <span class="fl j-numlitbdhyq">（含话费<em class="rcl">0</em>元，保底<em class="rcl">0</em>元/月，合约期<em class="rcl">0</em>个月）</span>
+                    <el-form-item label="价格：" prop="deposits">
+                      <span class="fl j-numlistprice"><em class="dw rcl">￥</em><em class="jg rcl">{{ form.deposits }}</em>元</span>
+                      <span class="fl j-numlitbdhyq">（含话费<em class="rcl">{{ form.deposits }}</em>元，保底<em class="rcl">{{ form.ruleBaseFee }}</em>元/月，合约期<em class="rcl">{{ form.inLen }}</em>个月）</span>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -66,8 +66,8 @@
                 </el-row>
                 <el-row>
                   <el-col :span="10">
-                    <el-form-item label="联系电话：" prop="number">
-                      <el-input v-model="form.number" placeholder="请输入电话号码" :maxlength="11"></el-input>
+                    <el-form-item label="联系电话：" prop="phoneNum">
+                      <el-input v-model="form.phoneNum" placeholder="请输入电话号码" :maxlength="11"></el-input>
                     </el-form-item>
                   </el-col>
                   <el-col :span="14" class="otherStyle">
@@ -112,6 +112,7 @@
       <busi-view
         v-if="addVisible"
         ref="busiView"
+        :cityId="cityId"
         @changeRow="changeRow"
       >
       </busi-view>
@@ -126,6 +127,8 @@
 // import SchoolApi from '@api/modules/school'
 import busiView from './component/businessHallView.vue'
 
+import {validMobile, validIDCard} from '../../utils/validate'
+
 export default {
   components: {
     busiView
@@ -133,16 +136,20 @@ export default {
   data() {
     return {
       form: {
-        num: '18768149374',
-        city: '杭州', // 选择地市
-        price: '13', // 价格
+        num: '',
+        cityName: '', // 选择地市
+        price: '', // 价格
+        deposits: '', // 预存
+        ruleBaseFee: '', // 保底
+        inLen: '', // 合约期
         manner: '预约至附近营业厅', // 购买方式
         businessHall: '', // 营业厅
         name: '', // 客户姓名
         idCard: '', // 身份证
-        number: '', // 联系电话
+        phoneNum: '', // 联系电话
         authCode: '' // 验证码
       },
+      cityId: '',
       // 是否展示营业厅选择弹窗
       addVisible: false,
       // 保存选中的营业厅信息
@@ -187,15 +194,48 @@ export default {
   computed: {
     changeBtnName: function() {
       return this.searchFlag === true ? '精确搜索' : '模糊搜索'
+    },
+    allinputed: function(){
+      let tips = ''
+      if (this.businessHall) {
+        tips = '请选择营业厅'
+        return tips
+      }
+      if (!this.form.name) {
+        tips = '客户姓名必须输入' 
+        return tips
+      }
+      if (!this.form.idCard || !validIDCard(this.form.idCard)) {
+        tips = '身份证号码格式不合法!请填写二代身份证号码!'
+        return tips
+      }
+      if (!this.form.phoneNum) {
+        tips = '请输入联系电话'
+        return tips
+      }
+      if (!validMobile(this.form.phoneNum)) {
+        tips = '请输入正确的联系电话'
+        return tips
+      }
+    }
+  },
+  created() {
+    if (this.$route.params.city) {
+      const {city,item} = this.$route.params
+      console.log(item)
+      this.form.cityName = city.label
+      this.cityId = city.value
+      this.form.num = item.teleCode
+      this.form.price = item.rulePrice
+      this.form.inLen = item.inLen
+      this.form.ruleBaseFee = item.ruleBaseFee
+      this.form.deposits = item.deposits
     }
   },
   mounted() {
     // this.qryNumList()
   },
   methods: {
-    selectCityId() {
-      console.log(this.form)
-    },
     handleHallView() {
       this.addVisible = true
       console.log(this.addVisible)
@@ -209,44 +249,25 @@ export default {
       console.log('=changeRow===', val)
       this.hallInfo = val
     },
-    handleSizeChange(size) {
-      this.queryParam.pageSize = size
-      this.handleQuery()
-    },
-    handleCurrentChange(currentPage) {
-      this.queryParam.pageNum = currentPage
-      this.pageData.pageNum = currentPage
-      this.handleQuery()
-    },
-
-    handleResetQuery() {
-      // 号码 预存 保底 合约期
-      this.queryParam = {
-        num: '',
-        priceScope: '',
-        consume: '',
-        tenor: '',
-        pageNum: 1,
-        pageSize: 10
-      }
-    },
     // 确认预约
     handleMake() {
       // 1. 判断用户信息是否填写完整
-
-      // 2. 判断用户输入信息格式是否有误
-
-      // 3. 预约逻辑
-      console.log('预约成功')
-      const params = {
-        name: 'jinbin',
-        age: '18'
+      if(this.allinputed){
+        alert(this.allinputed)
+        return false
       }
-      this.$router.push({
-        name: 'netOrderResult',
-        params
-      })
+      // 2. 判断用户输入信息格式是否有误
+      // 3. 预约逻辑
+      const params = {
+            name: 'jinbin',
+            age: '18'
+          }
+          this.$router.push({
+            name: 'netOrderResult',
+            params
+          })
     }
+      
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading" class="bgc" element-loading-text="拼命加载中">
+  <div v-loading="loading" class="bgc">
     <div class="wrap">
       <div id="breadNav" class="clearfix">
         <el-breadcrumb separator-class="el-icon-arrow-right" class="bread-crumd">
@@ -225,7 +225,7 @@
 <script>
 import SchoolApi from '@api/modules/school'
 import CommonApi from '@api/modules/common'
-// import NetOrderApi from './api/net-order'
+import NetOrderApi from './api/net-order'
 
 export default {
   data() {
@@ -270,6 +270,7 @@ export default {
       size: 24,
       serchValue: '', // 搜索值
       prValue: [], // 精确值
+      cityName: '', // 归属地市名
       citys: [], // 城市列表
       resDate: {}, // 号码规则信息列表
       telInfoList: [], // 号码信息列表
@@ -281,17 +282,14 @@ export default {
     changeBtnName: function() {
       return this.searchFlag === true ? '精确搜索' : '模糊搜索'
     },
-    makeTipText: function(){
+    makeTipText: function() {
       return `                       选择您喜欢的号码，填写领取号码时出示的证件信息，就可以到您选择的营业厅购买您预约的号码，您预约的号码我们将为您保留自预约时间起的48小时。`
     }
   },
+  created() {
+  },
   mounted() {
     this.qryCitys()
-    // 根据城市id请求相应号码规则
-    this.qryNumFilterCond()
-
-    // 根据选择的号码规则请求号码数据
-    this.qryNumList()
   },
   methods: {
     selectRule(arr) {
@@ -300,12 +298,12 @@ export default {
       this.defaultNum = ''
       if (str === 'city') {
         this.form.cityId = item.value
+        this.cityName = item.label
         // 选择城市 -> 规则
         this.qryNumFilterCond()
       }
       // 规则 -> 更新符合规则号码
-      // this.qryNumList()
-      // this.form.cityId = item[1].value
+      this.qryNumList()
     },
     changeSearch() {
       this.searchFlag = !this.searchFlag
@@ -390,8 +388,12 @@ export default {
             arr.splice(inx, 1)
           }
         })
-        console.log(data)
         this.citys = data
+        if(this.citys){
+          this.qryNumList()
+          // 根据城市id请求相应号码规则
+          this.qryNumFilterCond()
+        }
       })
     },
     // 搜索框搜索事件
@@ -424,6 +426,13 @@ export default {
     // 调用接口搜索号码
     qryNumList() {
       this.loading = true
+      
+        // 赋默认值
+      if (!this.form.cityId) {
+        console.log(this.citys);
+        this.form.cityId = this.citys[0].value
+        this.cityName = this.citys[0].label
+      }
       const params = {
         cityId: this.form.cityId,
         deposits: this.form.deposits,
@@ -470,23 +479,38 @@ export default {
     },
     qryNumFilterCond() {
       const params = {
-        cityId: this.form.cityId || '402881ea3286d488013286d756720002'
+        channelCode: "c1s0k3",
+        cityId: this.form.cityId,
       }
       console.log(params)
-      // NetOrderApi.qryNumFilterCond(params).then(resp => {
-      //   // this.resDate = resp.resdata
-      //   this.resDate = resp.resdata.map(item => {
-      //     item.unshift('全部')
-      //   })
-      //   console.log(this.resDate)
-      // })
+      NetOrderApi.qryNumFilterCond(params).then(resp => {
+        // this.resDate = resp.resdata
+        let newDate = resp.data.map(item=>{
+          if(item.numSearchType === 1){
+            this.resDate.deposits = item.numSearchList
+          }
+          if(item.numSearchType === 2){
+            this.resDate.baseRulePrice = item.numSearchList
+          }
+          if(item.numSearchType === 3){
+            this.resDate.numRule = item.numSearchList
+          }
+        })
+        this.resDate = newDate.map(item => {
+          item.unshift({paramName:'全部'})
+        })
+        console.log(this.resDate)
+      })
     },
     // 选择号码
-    selectNum(o) {
-      console.log(o)
+    selectNum(item) {
+      const city = {
+        label: this.cityName,
+        value: this.form.cityId
+      }
       const params = {
-        name: 'jin',
-        age: 18
+        city,
+        item
       }
       this.$router.push({
         name: 'netOrderInfo',
@@ -552,6 +576,9 @@ export default {
         border-color: #FF8800;
         box-shadow: -1px 0 0 0#FF8800;
         border-radius: 0;
+        .el-radio-button__inner{
+        color: #FFF;
+        }
       }
       .el-radio-button__orig-radio:checked+.el-radio-button__inner{
         color: #FFF;
