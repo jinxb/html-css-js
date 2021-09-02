@@ -112,7 +112,7 @@
       <busi-view
         v-if="addVisible"
         ref="busiView"
-        :cityId="cityId"
+        :city-id="cityId"
         @changeRow="changeRow"
       >
       </busi-view>
@@ -127,7 +127,7 @@
 // import SchoolApi from '@api/modules/school'
 import busiView from './component/businessHallView.vue'
 
-import {validMobile, validIDCard} from '../../utils/validate'
+import { validMobile, validIDCard } from '../../utils/validate'
 
 export default {
   components: {
@@ -195,15 +195,21 @@ export default {
     changeBtnName: function() {
       return this.searchFlag === true ? '精确搜索' : '模糊搜索'
     },
-    allinputed: function(){
+    allinputed: function() {
       let tips = ''
-      if (this.businessHall) {
+      if (!this.businessHall) {
         tips = '请选择营业厅'
         return tips
       }
       if (!this.form.name) {
-        tips = '客户姓名必须输入' 
+        tips = '客户姓名必须输入'
         return tips
+      }
+      if (this.form.name) {
+        const reg = /^([\u4e00-\u9fa5]{1,20}|[a-zA-Z\.\s]{1,20})$/
+        if (!reg.test(this.form.name)) {
+          tips = '客户姓名有非法字符'
+        }
       }
       if (!this.form.idCard || !validIDCard(this.form.idCard)) {
         tips = '身份证号码格式不合法!请填写二代身份证号码!'
@@ -217,11 +223,12 @@ export default {
         tips = '请输入正确的联系电话'
         return tips
       }
+      return false
     }
   },
   created() {
     if (this.$route.params.city) {
-      const {city,item} = this.$route.params
+      const { city, item } = this.$route.params
       console.log(item)
       this.form.cityName = city.label
       this.cityId = city.value
@@ -252,22 +259,21 @@ export default {
     // 确认预约
     handleMake() {
       // 1. 判断用户信息是否填写完整
-      if(this.allinputed){
+      if (this.allinputed) {
         alert(this.allinputed)
         return false
       }
       // 2. 判断用户输入信息格式是否有误
       // 3. 预约逻辑
       const params = {
-            name: 'jinbin',
-            age: '18'
-          }
-          this.$router.push({
-            name: 'netOrderResult',
-            params
-          })
+        name: 'jinbin',
+        age: '18'
+      }
+      this.$router.push({
+        name: 'netOrderResult',
+        params
+      })
     }
-      
   }
 }
 </script>

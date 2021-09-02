@@ -53,7 +53,7 @@
 
 <script>
 import CommonApi from '@api/modules/common'
-
+import NetOrderApi from '../api/net-order'
 
 export default {
   props: {
@@ -167,6 +167,7 @@ export default {
   },
   created() {
     this.qryRegions()
+    this.qryHallInfo()
     this.loading = true
   },
   mounted() {
@@ -255,7 +256,7 @@ export default {
       this.currentIndex = index
     },
     qryRegions() {
-      console.log(this.cityId);
+      console.log(this.cityId)
       const params = {
         cityId: this.cityId,
         pkgId: ''
@@ -265,6 +266,15 @@ export default {
         console.log(this.regions)
       })
     },
+    qryHallInfo() {
+      const params = {
+        orgName: '营业厅',
+        cityId: this.cityId
+      }
+      NetOrderApi.qryHallInfoList(params).then(resp => {
+        console.log(resp)
+      })
+    }
   }
 }
 </script>

@@ -389,7 +389,7 @@ export default {
           }
         })
         this.citys = data
-        if(this.citys){
+        if (this.citys) {
           this.qryNumList()
           // 根据城市id请求相应号码规则
           this.qryNumFilterCond()
@@ -426,10 +426,9 @@ export default {
     // 调用接口搜索号码
     qryNumList() {
       this.loading = true
-      
-        // 赋默认值
+      // 赋默认值
       if (!this.form.cityId) {
-        console.log(this.citys);
+        console.log(this.citys)
         this.form.cityId = this.citys[0].value
         this.cityName = this.citys[0].label
       }
@@ -479,25 +478,25 @@ export default {
     },
     qryNumFilterCond() {
       const params = {
-        channelCode: "c1s0k3",
-        cityId: this.form.cityId,
+        channelCode: 'c1s0k3',
+        cityId: this.form.cityId
       }
       console.log(params)
       NetOrderApi.qryNumFilterCond(params).then(resp => {
         // this.resDate = resp.resdata
-        let newDate = resp.data.map(item=>{
-          if(item.numSearchType === 1){
+        const newDate = resp.data.map(item => {
+          if (item.numSearchType === 1) {
             this.resDate.deposits = item.numSearchList
           }
-          if(item.numSearchType === 2){
+          if (item.numSearchType === 2) {
             this.resDate.baseRulePrice = item.numSearchList
           }
-          if(item.numSearchType === 3){
+          if (item.numSearchType === 3) {
             this.resDate.numRule = item.numSearchList
           }
         })
         this.resDate = newDate.map(item => {
-          item.unshift({paramName:'全部'})
+          item.unshift({ paramName: '全部' })
         })
         console.log(this.resDate)
       })

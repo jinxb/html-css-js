@@ -1,21 +1,22 @@
 import request from '@utils/request'
-import api from '@api'
-
-
 // const API_BASE_URL = '/netOrder'
-class netOrderApi{
+class NetOrderApi {
   /**
    *  根据城市id请求相应号码规则
    */
-   qryNumFilterCond(params) {
+  qryNumFilterCond(params) {
     return request({
       url: 'search/condition',
       method: 'post',
       data: params
     })
   }
-  
-
+  qryHallInfoList(params) {
+    return request({
+      url: 'numcard/org/list',
+      method: 'post',
+      data: params
+    })
+  }
 }
-
-export default new netOrderApi()
+export default new NetOrderApi()
