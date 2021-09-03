@@ -20,7 +20,7 @@
               <p>选择您喜欢的号码，填写领取号码时出示的证件信息，就可以到您选择的营业厅购买您预约的号码，您预约的号码我们将为您保留自预约时间起的48小时。</p>
             </div> -->
         <div class="layout">
-          <el-form ref="form" :model="form" :inline="true" label-width="130px">
+          <el-form ref="form" :model="form" label-width="130px">
             <div class="numBox">
               <!-- 标题 -->
               <h3 class="n-title">
@@ -39,7 +39,7 @@
                           @change="selectRule([item,'city'])"
                         >
                           <!-- :class="{selectBgc: currentIndex === index}" -->
-                          <el-radio-button :label="item.label" :class="{defaultSelect:index === defaultNum}" @click="handleSelectBtn(index)"></el-radio-button>
+                          <el-radio-button :label="item.label" :class="{defaultSelect:item.cId === defaultNum}" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
                       </el-form-item>
                     </div>
@@ -51,11 +51,11 @@
                       <el-form-item label="预存范围：" prop="deposits">
                         <el-radio-group
                           v-for="(item,index) in resDate.deposits"
-                          :key="item"
+                          :key="item.conditionId"
                           v-model="form.deposits"
                           @change="selectRule([item,'deposits'])"
                         >
-                          <el-radio-button :label="item" @click="handleSelectBtn(index)"></el-radio-button>
+                          <el-radio-button :label="item.paramName" :class="{defaultSelect:item.cId === defaultNum}" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
                       </el-form-item>
                     </div>
@@ -65,8 +65,8 @@
                   <el-col :span="24">
                     <div>
                       <el-form-item label="保底消费：" prop="baseRulePrice">
-                        <el-radio-group v-for="(item,index) in resDate.baseRulePrice" :key="item" v-model="form.baseRulePrice" @change="selectRule([item,'baseRulePrice'])">
-                          <el-radio-button :label="item" @click="handleSelectBtn(index)"></el-radio-button>
+                        <el-radio-group v-for="(item,index) in resDate.baseRulePrice" :key="item.conditionId" v-model="form.baseRulePrice" @change="selectRule([item,'baseRulePrice'])">
+                          <el-radio-button :label="item.paramName" :class="{defaultSelect:item.cId === defaultNum}" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
                       </el-form-item>
                     </div>
@@ -76,8 +76,8 @@
                   <el-col :span="24">
                     <div>
                       <el-form-item label="靓号规则：" prop="numRule">
-                        <el-radio-group v-for="(item,index) in resDate.numRule" :key="item" v-model="form.numRule" @change="selectRule([item,'numRule'])">
-                          <el-radio-button :label="item" @click="handleSelectBtn(index)"></el-radio-button>
+                        <el-radio-group v-for="(item,index) in resDate.numRule" :key="item.conditionId" v-model="form.numRule" @change="selectRule([item,'numRule'])">
+                          <el-radio-button :label="item.paramName" :class="{defaultSelect:item.cId === defaultNum}" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
                       </el-form-item>
                     </div>
@@ -86,9 +86,9 @@
                 <el-row>
                   <el-col :span="24">
                     <div>
-                      <el-form-item label="选择号段：" prop="telePer">
-                        <el-radio-group v-for="(item,index) in resDate.telePer" :key="item" v-model="form.segment" @change="selectRule([item,'segment'])">
-                          <el-radio-button :label="item" @click="handleSelectBtn(index)"></el-radio-button>
+                      <el-form-item label="选择号段：" prop="telCodePer">
+                        <el-radio-group v-for="(item,index) in resDate.telePer" :key="item.conditionId" v-model="form.telCodePer" @change="selectRule([item,'telePer'])">
+                          <el-radio-button :label="item.paramName" :class="{defaultSelect:item.cId === defaultNum}" @click="handleSelectBtn(index)"></el-radio-button>
                         </el-radio-group>
                       </el-form-item>
                     </div>
@@ -272,7 +272,7 @@ export default {
       prValue: [], // 精确值
       cityName: '', // 归属地市名
       citys: [], // 城市列表
-      resDate: {}, // 号码规则信息列表
+      resDate: [], // 号码规则信息列表
       telInfoList: [], // 号码信息列表
       selectedNum: '', // 选中的号码
       value: ''
@@ -295,12 +295,34 @@ export default {
     selectRule(arr) {
       const [item, str] = arr
       console.log(item, str)
-      this.defaultNum = ''
       if (str === 'city') {
+        this.citys[0].cId = ''
         this.form.cityId = item.value
         this.cityName = item.label
         // 选择城市 -> 规则
         this.qryNumFilterCond()
+        this.form.deposits = ''
+        this.form.baseRulePrice = ''
+        this.form.numRule = ''
+        this.form.telCodePer = ''
+      }
+      if (str === 'deposits') {
+        console.log("1")
+        this.resDate['deposits'][0].cId = ''
+        this.form.deposits = item.paramName
+        console.log(this.resDate['deposits'])
+      }
+      if (str === 'baseRulePrice') {
+        this.resDate['baseRulePrice'][0].cId = ''
+        this.form.baseRulePrice = item.paramName
+      }
+      if (str === 'numRule') {
+        this.resDate['numRule'][0].cId = ''
+        this.form.numRule = item.paramName
+      }
+      if (str === 'telePer') {
+        this.resDate['telePer'][0].cId = ''
+        this.form.telCodePer = item.paramName
       }
       // 规则 -> 更新符合规则号码
       this.qryNumList()
@@ -389,6 +411,7 @@ export default {
           }
         })
         this.citys = data
+        this.citys[0].cId = 0
         if (this.citys) {
           this.qryNumList()
           // 根据城市id请求相应号码规则
@@ -399,7 +422,7 @@ export default {
     // 搜索框搜索事件
     onSearch() {
       if (!this.searchFlag) {
-        console.log(this.prValue)
+        // console.log(this.prValue)
         if (this.prValue.length !== 0) {
           const arr = Array.of('|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|')
           this.form.telCode = arr.map((item, index) => {
@@ -428,10 +451,11 @@ export default {
       this.loading = true
       // 赋默认值
       if (!this.form.cityId) {
-        console.log(this.citys)
+        // console.log(this.citys)
         this.form.cityId = this.citys[0].value
         this.cityName = this.citys[0].label
       }
+      // console.log(this.form.telCodePer)
       const params = {
         cityId: this.form.cityId,
         deposits: this.form.deposits,
@@ -455,7 +479,6 @@ export default {
       this.telInfoList = []
       SchoolApi.searchNum(params).then((resp) => {
         this.loading = false
-        console.log(resp)
         this.pageData.total = resp.data.total || 0
         this.pageData.results = resp.data.telInfoList
         // if (resp.data.telInfoList && resp.data.telInfoList.length > 0) {
@@ -481,24 +504,34 @@ export default {
         channelCode: 'c1s0k3',
         cityId: this.form.cityId
       }
-      console.log(params)
       NetOrderApi.qryNumFilterCond(params).then(resp => {
         // this.resDate = resp.resdata
-        const newDate = resp.data.map(item => {
-          if (item.numSearchType === 1) {
+        // this.resDate = new Map()
+        console.log(resp)
+        resp.map(item => {
+          if (item.numSearchType === '1') {
+            item.numSearchList.unshift({ paramName: '全部', cId: 0 })
+            console.log("111111");
+            // this.resDate.set('deposits', item.numSearchList)
             this.resDate.deposits = item.numSearchList
           }
-          if (item.numSearchType === 2) {
+          if (item.numSearchType === '2') {
+            item.numSearchList.unshift({ paramName: '全部', cId: 0 })
             this.resDate.baseRulePrice = item.numSearchList
+            // this.resDate.set('baseRulePrice', item.numSearchList)
           }
-          if (item.numSearchType === 3) {
+          if (item.numSearchType === '3') {
+            item.numSearchList.unshift({ paramName: '全部', cId: 0 })
             this.resDate.numRule = item.numSearchList
+            // this.resDate.set('numRule', item.numSearchList)
+          }
+          if (item.numSearchType === '4') {
+            item.numSearchList.unshift({ paramName: '全部', cId: 0 })
+            this.resDate.telePer = item.numSearchList
+            // this.resDate.set('numRule', item.numSearchList)
           }
         })
-        this.resDate = newDate.map(item => {
-          item.unshift({ paramName: '全部' })
-        })
-        console.log(this.resDate)
+        console.log(this.resDate.deposits)
       })
     },
     // 选择号码
@@ -568,6 +601,7 @@ export default {
       font-size: 18px !important;
       .propList{
         padding-right: 60px;
+        margin-bottom: 15px;
       }
       .defaultSelect{
         color: #FFF;
@@ -596,6 +630,9 @@ export default {
       }
       .el-form-item {
         margin-bottom: 10px;
+        .el-radio-group {
+            margin-right: 10px;
+        }
       }
       .el-radio-button__inner{
         border: 0;
@@ -615,6 +652,7 @@ export default {
         font-size: 18px;
       }
       .n_search{
+        display: inline-block;
         margin-bottom: 0;
         .el-form-item__content{
           height: 40px;
