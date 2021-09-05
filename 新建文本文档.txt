@@ -1,0 +1,39 @@
+vuex 响应式数据
+
+
+自己实现数据共享  利用原型链  给vue的原型上加变量  prototype
+
+
+vue.set(targetObj，'属性'，'值');
+
+vue.delete(targetObj，'属性');
+
+如何实现响应式  -》》
+
+
+state(共享数据)  ——render》  components——dispatch》Actions
+
+
+
+actions 异步操作 ——commit》mutations
+
+
+所有修改操作需要用mutations   ——mutate》 state
+mutations  (为了让devtoo监听到具体是谁修改的数据) 
+
+
+getters  处理需要计算的state数据
+
+setters
+
+
+
+
+
+
+开发步骤：
+	1.目录划分
+	2.css引入（normalize.css + base.css)
+	3.配置路径 (vue.config.js)
+		
+		
