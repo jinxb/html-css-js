@@ -1,4 +1,5 @@
 import request from '@utils/request'
+import api from '@api/index'
 // const API_BASE_URL = '/netOrder'
 class NetOrderApi {
   /**
@@ -14,6 +15,14 @@ class NetOrderApi {
   qryHallInfoList(params) {
     return request({
       url: 'numcard/org/list',
+      method: 'post',
+      data: params
+    })
+  }
+  // 省市县查询
+  qryCountry(params) {
+    return request({
+      url: api.school.qryCountry,
       method: 'post',
       data: params
     })

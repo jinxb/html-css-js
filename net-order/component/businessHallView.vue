@@ -9,7 +9,7 @@
       <el-row>
         <el-col :span="24">
           <el-form-item>
-            <el-button v-for="(o,index) in 13" :key="o" type="primary" :class="['cityBtn',{selectedBtn: currentIndex === index}]" @click="handleCityBtn(index)">{{ o }}</el-button>
+            <el-button v-for="(item,index) in regions" :key="item.value" type="primary" :class="['cityBtn',{selectedBtn: currentIndex === index}]" @click="handleCityBtn({item,index})">{{ item.name }}</el-button>
           </el-form-item>
         </el-col>
       </el-row>
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import CommonApi from '@api/modules/common'
+// import CommonApi from '@api/modules/common'
 import NetOrderApi from '../api/net-order'
 
 export default {
@@ -166,11 +166,11 @@ export default {
     }
   },
   created() {
-    this.qryRegions()
-    this.qryHallInfo()
-    this.loading = true
   },
   mounted() {
+    this.qryCountry()
+    this.qryHallInfo()
+    this.loading = true
     // if (this.packageIds.length > 0) {
     //   this.handleSearch(this.packageIds)
     // } else {
@@ -252,18 +252,19 @@ export default {
       }
     },
     // 切换城市
-    handleCityBtn(index) {
-      this.currentIndex = index
+    handleCityBtn(obj) {
+      this.currentIndex = obj.index
+      console.log(obj.item)
     },
-    qryRegions() {
+    qryCountry() {
       console.log(this.cityId)
       const params = {
         cityId: this.cityId,
-        pkgId: ''
+        provinceId: this.cityId
       }
-      CommonApi.qryRegions(params).then((resp) => {
+      NetOrderApi.qryCountry(params).then(resp => {
+        console.log(resp)
         this.regions = resp.data
-        console.log(this.regions)
       })
     },
     qryHallInfo() {

@@ -197,7 +197,7 @@ export default {
     },
     allinputed: function() {
       let tips = ''
-      if (!this.businessHall) {
+      if (!this.form.businessHall) {
         tips = '请选择营业厅'
         return tips
       }
